@@ -40,7 +40,7 @@ function myFunc(foo, bar) {
   * [x] Basic functionality
   * [x] Basic tests
   * [x] Assertion class
-  * [ ] Executing common assertions without having them in the `assertions` array
+  * [x] Executing common assertions without having them in the `assertions` array
   * [ ] Aliases
 * [ ] Assertions
   * [ ] general
@@ -58,12 +58,16 @@ function myFunc(foo, bar) {
     * [ ] value
     * [ ] minValue
     * [ ] maxValue
-    * [ ] largerThan
+    * [ ] lt
+    * [ ] lte
+    * [ ] gt
+    * [ ] gte
     * [ ] ...
   * [ ] string
     * [ ] ...
   * [ ] date
     * [ ] ...
+  * [ ] rexexp
   * [ ] object
     * [ ] isPlain
     * [ ] ...
