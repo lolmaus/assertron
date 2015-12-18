@@ -44,38 +44,61 @@ function myFunc(foo, bar) {
   * [ ] Aliases
 * [ ] Assertions
   * [ ] general
-    * [ ] length
-    * [ ] value
+    * [ ] equals / equal / is / value
+    * [ ] instanceOf / instanceof / isA
+    * [ ] falsy
+    * [ ] false
+    * [ ] nully
+    * [ ] null
+    * [ ] defined
+    * [ ] undefined
+    * [x] length / len
+    * [x] minLength
+    * [x] maxLength
     * [ ] or
     * [ ] optional
     * [ ] instanceof
-    * [ ] ...
-  * [ ] number
-    * [x] isNumber
-    * [x] orString
-    * [x] isFinite
-    * [ ] isInteger
-    * [ ] value
-    * [ ] minValue
-    * [ ] maxValue
     * [ ] lt
     * [ ] lte
     * [ ] gt
     * [ ] gte
-    * [ ] ...
+    * [ ] generic (function)
+  * [ ] number
+    * [x] isNumber
+    * [x] orString
+    * [x] isFinite / finite
+    * [x] isInfinite / infinite
+    * [ ] isInteger
+    * [x] value
+    * [ ] minValue
+    * [ ] maxValue
+    * [ ] negative
+    * [ ] positive
+    * [ ] zero
+    * [ ] within
   * [ ] string
-    * [ ] ...
+    * [ ] empty
+    * [ ] notEmpty / nonEmpty
+    * [ ] within
+    * [ ] beginsWith
+    * [ ] contains
+    * [ ] endsWith
+    * [ ] matches
   * [ ] date
     * [ ] ...
   * [ ] rexexp
   * [ ] object
     * [ ] isPlain
+    * [ ] Satisfy
     * [ ] ...
   * [ ] function
     * [ ] ...
+  * [ ] error
+    * [ ] message
+  * [ ] promise
 * [ ] Plugins system
-* [ ] Chai integration
 * [ ] Build
 * [ ] Noop
+* [ ] Async
 * [ ] Configure JSLint and clean up code
 * [ ] Cover JSVerifier source with JSVerifier :metal:

@@ -1,23 +1,24 @@
-import Assertion from './_assertion';
-import isNumber  from 'lodash/lang/isNumber';
-import cloneDeep from 'lodash/lang/cloneDeep';
+import BaseAssertion from './base';
+import isNumber      from 'lodash/lang/isNumber';
+import cloneDeep     from 'lodash/lang/cloneDeep';
 
-export default class NumberAssertion extends Assertion {
-  _main(victim, contract = {
+export default class NumberAssertion extends BaseAssertion {
+  _validate(victim, contract = {
     orString: false,
     isFinite: false
   }) {
+    const baseCheck = contract.orString ? 'orString' : 'isNumber';
+    const baseCheckResult = this[baseCheck](victim);
+
+    if (baseCheckResult !== true) {
+      return [baseCheckResult];
+    }
+
+    if (contract === true) {
+      return [];
+    }
 
     contract = cloneDeep(contract);
-
-    let result =
-      contract.orString
-        ? this.orString(victim)
-        : this.isNumber(victim);
-
-    if (!result.result) {
-      return result;
-    }
 
     delete contract.isNumber;
     delete contract.orString;
@@ -26,23 +27,14 @@ export default class NumberAssertion extends Assertion {
   }
 
   isNumber(victim) {
-    return {
-      result:  typeof victim === 'number',
-      message: 'expected to be a number'
-    }
+    return isNumber(victim) || this._makeAssertionError(victim, 'expected to be a number');
   }
 
   orString(victim) {
-    return {
-      result:  !isNaN(parseFloat(victim)),
-      message: 'expected to be a number or a string containing a number'
-    }
+    return !isNaN(parseFloat(victim)) || this._makeAssertionError(victim, 'expected to be a number or a string containing a number');
   }
 
   isFinite(victim) {
-    return {
-      result:  isFinite(victim),
-      message: 'expected to be finite'
-    };
+    return isFinite(victim) || this._makeAssertionError(victim, 'expected to be finite');
   }
 }
