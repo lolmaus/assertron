@@ -1,84 +1,54 @@
-import V               from '../../src/jsverifier';
-//import BaseAssertion   from '../../src/assertions/base';
+import V, {assertron}               from '../../src/jsverifier';
 import ContractError   from '../../src/contract-error';
 //import AssertionError  from 'assertion-error';
 
 
 
-//describe('JSVerifier', () => {
-//  let jsverifier;
-//
-//  beforeEach(() => {
-//    jsverifier = new JSVerifier();
-//  });
-//
-//
-//
-//
-//  describe('assert', () => {
-//
-//    const assertions = {
-//      foosertion: class Foosertion extends BaseAssertion {
-//        _validate(victim, contract) {
-//          return {
-//            result:  true,
-//            message: "doesn't matter"
-//          };
-//        }
-//      },
-//
-//      barsertion: class Barsertion extends BaseAssertion {
-//        _validate(victim, contract) {
-//          return {
-//            result:  false,
-//            message: "doesn't matter"
-//          };
-//        }
-//      }
-//    };
-//
-//    it('should work', () => {
-//      jsverifier.assert('victim', 'foosertion', 'contract', assertions);
-//    });
-//
-//    it('should throw', () => {
-//      expect(() => {
-//        jsverifier.assert('victim', 'barsertion', 'contract', assertions);
-//      }).throws(ContractError);
-//    });
-//
-//  }); // assert
-//
-//
-//
-//  describe('validate', () => {
-//    it('should work', () => {
-//      stub(jsverifier, 'assert');
-//
-//      const contract = {
-//        foo: 'Foo',
-//        bar: 'Bar'
-//      };
-//
-//      const result = jsverifier.validate('victim', contract);
-//
-//      expect(result).ok;
-//
-//      expect(jsverifier.assert)
-//        .calledTwice
-//        .calledWithExactly('victim', 'foo', 'Foo')
-//        .calledWithExactly('victim', 'bar', 'Bar');
-//
-//      jsverifier.assert.restore();
-//    });
-//  }); // validate
-//});
+
+
+describe('assertron', () => {
+  let toss = assertron.toss;
+  describe('throw', () => {
+    it('should throw first error from array', () => {
+      expect(() => {
+        toss([new Error('foo'), new Error('bar')]);
+      }).throws('foo');
+    });
+
+    it('should throw error if error is passed', () => {
+      expect(() => {
+        toss(new Error('foo'));
+      }).throws(Error, 'foo');
+
+      expect(() => {
+        toss(new ContractError('foo'));
+      }).throws(ContractError, 'foo');
+    });
+
+    it('should throw error with an object/primitive if object/primitive was passed', () => {
+      expect(() => {
+        toss('foo');
+      }).throws(ContractError, 'foo');
+
+      const obj = {};
+      expect(() => {
+        toss(obj);
+      }).throws(ContractError, obj);
+    });
+
+    it('should not throw if nothing is passed', () => {
+      toss();
+    });
+
+    it('should not throw if an empty array is passed', () => {
+      toss([]);
+    });
+  });
+});
 
 
 
-
-
-describe.skip('V', () => {
+describe('V', () => {
 
   describe('number', () => {
     it('number: should validate a number', () => {
@@ -101,23 +71,68 @@ describe.skip('V', () => {
         string: true,
         number: {
           orString: true,
-          minValue: 4
+          isFinite: true
         }
       });
     });
 
-    it('number: should validate a number', () => {
+    it('number: should throw on non-matching contract', () => {
       expect(() => {
         V('55', {
           length: 1,
           string: true,
           number: {
             orString: true,
-            minValue: 4
+            isFinite: true
           }
         });
       })
         .throws(ContractError, /length/);
+    });
+  }); // multiple assertions
+
+
+  describe('or', () => {
+    it('should validate a matching contract - 1', () => {
+      V('5', {
+        length: 1,
+        or: {
+          number: 4,
+          string: {length: 1}
+        }
+      });
+    });
+
+    it('should validate a matching contract - 2', () => {
+      V(4, {
+        or: {
+          number: 4,
+          string: {length: 1}
+        }
+      });
+    });
+
+    it('should throw on a non-matching contract - 1', () => {
+      expect(() => {
+        V('5', {
+          length: 1,
+          or: {
+            number: 4,
+            string: {length: 2}
+          }
+        });
+      }).throws(ContractError);
+    });
+
+    it('should throw on a non-matching contract - 2', () => {
+      expect(() => {
+        V(4, {
+          or: {
+            number: 5,
+            string: true
+          }
+        });
+      }).throws(ContractError);
     });
   }); // multiple assertions
 

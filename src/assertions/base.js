@@ -8,6 +8,10 @@ import isArray        from 'lodash/lang/isArray';
 
 export default class BaseAssertion {
 
+  constructor({assertions}) {
+    this.assertions = assertions;
+  }
+
   _makeAssertionError(victim, message) {
     return new ContractError(`${message}: ${victim}`);
   }
@@ -72,5 +76,10 @@ export default class BaseAssertion {
     }
 
     throw new Error('JSVerifier: incorrect contract passed to "length", should be either number or object');
+  }
+
+  value (victim, contract) {
+    return victim === contract
+      || this._makeAssertionError(victim, `expected to be strictly equal to ${contract}`);
   }
 }

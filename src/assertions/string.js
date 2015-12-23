@@ -5,7 +5,13 @@ import cloneDeep     from 'lodash/lang/cloneDeep';
 export default class StringAssertion extends BaseAssertion {
   _validate(victim, contract = {
   }) {
-    return this.isString(victim);
+    const baseCheckResult = this.isString(victim);
+
+    if (baseCheckResult !== true) {
+      return [baseCheckResult];
+    }
+
+    return this._parseContract(victim, contract);
   }
 
   isString(victim) {

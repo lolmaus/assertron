@@ -18,6 +18,11 @@ export default class NumberAssertion extends BaseAssertion {
       return [];
     }
 
+    if (isNumber(contract)) {
+      const checkResult = this.value(victim, contract);
+      return checkResult === true ? [] : [checkResult];
+    }
+
     contract = cloneDeep(contract);
 
     delete contract.isNumber;

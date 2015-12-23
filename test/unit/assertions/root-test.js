@@ -1,10 +1,13 @@
+import assertions    from '../../../src/assertions';
 import RootAssertion from '../../../src/assertions/root';
+import ContractError from '../../../src/contract-error';
 
-describe('base', () => {
-  let assertion;
+describe('root', () => {
+  let root, or;
 
   beforeEach(() => {
-    assertion = new RootAssertion();
+    root = new RootAssertion({assertions});
+    or   = root.or.bind(root);
   });
 
   describe('_validate', () => {
@@ -16,16 +19,16 @@ describe('base', () => {
         baz: 'Baz'
       };
 
-      const fooSpy  = stub().returns(true);
+      const fooSpy  = stub().returns([]);
       const barSpy  = stub().returns(true);
-      assertion.baz = stub().returns(true);
+      root.baz = stub().returns(true);
 
       const assertions = {
-        foo: class Foo { _validate (...args) { return fooSpy(...args); }},
-        bar: class Bar { _validate (...args) { return barSpy(...args); }}
+        foo: spy(class Foo { _validate (...args) { return fooSpy(...args); }}),
+        bar: spy(class Bar { _validate (...args) { return barSpy(...args); }})
       };
 
-      const result = assertion._validate('victim', contract, assertions);
+      const result = root._validate('victim', contract, assertions);
 
       expect(result).deep.equal([]);
 
@@ -37,9 +40,17 @@ describe('base', () => {
         .calledOnce
         .calledWithExactly('victim', 'Bar');
 
-      expect(assertion.baz)
+      expect(root.baz)
         .calledOnce
         .calledWithExactly('victim', 'Baz');
+
+      expect(assertions.foo)
+        .calledOnce
+        .calledWithExactly(assertions);
+
+      expect(assertions.bar)
+        .calledOnce
+        .calledWithExactly(assertions);
     });
 
 
@@ -53,14 +64,14 @@ describe('base', () => {
 
       const fooSpy  = stub().returns({message: 'Foo'});
       const barSpy  = stub().returns(true);
-      assertion.baz = stub().returns({message: 'Bar'});
+      root.baz = stub().returns({message: 'Bar'});
 
       const assertions = {
         foo: class Foo { _validate (...args) { return fooSpy(...args); }},
         bar: class Bar { _validate (...args) { return barSpy(...args); }}
       };
 
-      const result = assertion._validate('victim', contract, assertions);
+      const result = root._validate('victim', contract, assertions);
 
       expect(result.length).equal(2);
       expect(result[0]).deep.equal({message: 'Foo'});
@@ -75,10 +86,29 @@ describe('base', () => {
       };
 
       expect( () => {
-        assertion._validate('victim', contract, {});
+        root._validate('victim', contract, {});
       })
-        .throw(Error);
+        .throw(Error, /does not exist/);
     });
 
+  }); // _validate
+
+  describe('or', () => {
+    it('should return [] if at least one of assertions is fine', () => {
+      const result = or('1', {number: true, string: true});
+      expect(result).deep.equal([]);
+    });
+
+    it('should return [] if at all assertions are fine', () => {
+      const result = or('1', {number: {orString: true}, string: true});
+      expect(result).deep.equal([]);
+    });
+
+    it('should return errors if all assertions fail', () => {
+      const result = or(true, {number: true, string: true});
+      expect(result).length(2);
+      expect(result[0]).instanceof(ContractError);
+      expect(result[1]).instanceof(ContractError);
+    });
   });
 });

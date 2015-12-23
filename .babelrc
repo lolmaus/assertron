@@ -1,3 +1,4 @@
 {
-  "blacklist": ["useStrict"]
+  "blacklist": ["useStrict"],
+  "optional": ["es7.classProperties"]
 }

@@ -122,7 +122,7 @@ function getBundler() {
   }));
 
   return bundler;
-};
+}
 
 // Build the unit test suite for running tests
 // in the browser

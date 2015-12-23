@@ -1,3 +1,4 @@
+import assertions    from '../../../src/assertions';
 import Number        from '../../../src/assertions/number';
 import ContractError from '../../../src/contract-error';
 
@@ -6,7 +7,7 @@ describe('number', () => {
   let number;
 
   beforeEach(() => {
-    number = new Number();
+    number = new Number(assertions);
   });
 
 
@@ -89,9 +90,25 @@ describe('number', () => {
 
     describe('simple', () => {
 
-      it('should accept number', () => {
+      it('should accept number vs true', () => {
         expect(number._validate(5, true)).eql([]);
         expect(number._validate(0, true)).eql([]);
+      });
+
+      it('should accept number vs same number', () => {
+        expect(number._validate(5, 5)).eql([]);
+        expect(number._validate(0, 0)).eql([]);
+      });
+
+      it('should reject number vs a different number', () => {
+        const result = number._validate(5, 6);
+
+        expect(result)
+          .instanceOf(Array)
+          .length(1);
+
+        expect(result[0]).instanceOf(ContractError);
+        expect(result[0].message).equal('expected to be strictly equal to 6: 5');
       });
 
       it('should reject string', () => {

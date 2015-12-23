@@ -1,35 +1,36 @@
-//import ContractError from './contract-error';
-//import assertions    from './assertions';
-import RootAssertion    from './assertions/root';
-//import forOwn        from 'lodash/object/forOwn'
+import allAssertions from './assertions';
+import ContractError   from './contract-error';
+import isArray       from 'lodash/lang/isArray';
+import isError       from 'lodash/lang/isError';
 
-//export class JSVerifier {
-//  //constructor(assertions = assertions) {
-//  //  this.assertions = assertions;
-//  //}
-//
-//  //assert(victim, assertionName, contract, assertions = this.assertions) {
-//  //  const assertion         = new assertions[assertionName]();
-//  //  const {result, message} = assertion._validate(victim, contract);
-//  //
-//  //  if (!result) {
-//  //    throw new ContractError(message);
-//  //  }
-//  //}
-//
-//  validate(victim, contract) {
-//    //forOwn(contract, (value, key) => {
-//    //  this.assert(victim, key, value);
-//    //});
-//    const baseAssertion = new BaseAssertion();
-//    baseAssertion._validate(victim, contract)
-//
-//    return true;
-//  }
-//}
-//
-//const verifier = new JSVerifier();
-const rootAssertion = new RootAssertion();
-const V             = rootAssertion._validate.bind(rootAssertion);
+export class Assertron {
+  constructor({assertions = allAssertions} = {}) {
+    this.assertions = assertions;
+  }
 
-export default V;
+  toss(errors) {
+    let error = isArray(errors) ? errors[0] : errors;
+
+    if (error !== undefined && !isError(error)) {
+      error = new ContractError(error);
+    }
+
+    if (error) {
+      throw error;
+    }
+  }
+
+  validate(victim, contract) {
+    const rootAss = new this.assertions.root({assertions: this.assertions});
+    const errors = rootAss._validate(victim, contract);
+    console.log('errors', errors)
+    this.toss(errors);
+    return true;
+  }
+}
+
+export const assertron = new Assertron();
+
+const validate = assertron.validate.bind(assertron);
+
+export default validate;
