@@ -1,9 +1,9 @@
+import base from './assertions/base';
 import number from './assertions/number';
-import root   from './assertions/root';
 import string from './assertions/string';
 
 export default {
+  base,
   number,
-  root,
   string
 };

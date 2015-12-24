@@ -3,10 +3,11 @@ import BaseAssertion from '../../../src/assertions/base';
 import ContractError from '../../../src/contract-error';
 
 describe('base', () => {
-  let assertion;
+  let base, or;
 
   beforeEach(() => {
-    assertion = new BaseAssertion(assertions);
+    base = new BaseAssertion({assertions});
+    or   = base.or.bind(base);
   });
 
   describe('_makeAssertionError', () => {
@@ -15,7 +16,7 @@ describe('base', () => {
       const foo = {
         toString () {return 'bar'}
       };
-      const result = assertion._makeAssertionError(foo, 'baz');
+      const result = base._makeAssertionError(foo, 'baz');
       expect(result).instanceOf(ContractError);
       expect(result.message).equal('baz: bar');
     });
@@ -26,25 +27,25 @@ describe('base', () => {
 
   describe('_parseContract', () => {
     it('should call callbacks', () => {
-      assertion.foo = stub().returns(true);
-      assertion.bar = stub().returns(true);
+      base.foo = stub().returns(true);
+      base.bar = stub().returns(true);
 
       const contract = {
         foo: 'Foo',
         bar: 'Bar'
       };
 
-      const result = assertion._parseContract('victim', contract);
+      const result = base._parseContract('victim', contract);
 
       expect(result)
         .instanceOf(Array)
         .length(0);
 
-      expect(assertion.foo)
+      expect(base.foo)
         .calledOnce
         .calledWithExactly('victim', 'Foo');
 
-      expect(assertion.bar)
+      expect(base.bar)
         .calledOnce
         .calledWithExactly('victim', 'Bar');
     }); // should call callbacks
@@ -122,25 +123,25 @@ describe('base', () => {
 
   describe('exactLength', () => {
     it('should report true for matching length', () => {
-      expect(assertion.exactLength('asdf',    4)).true;
-      expect(assertion.exactLength('',        0)).true;
-      expect(assertion.exactLength([1, 2, 3], 3)).true;
+      expect(base.exactLength('asdf',    4)).true;
+      expect(base.exactLength('',        0)).true;
+      expect(base.exactLength([1, 2, 3], 3)).true;
     });
 
     it('should report error for non-matching length - string 1', () => {
-      const result = assertion.exactLength('asdf', 5);
+      const result = base.exactLength('asdf', 5);
       expect(result).instanceOf(ContractError);
       expect(result.message).equal('expected to have length of 5: asdf');
     });
 
     it('should report error for non-matching length - string 2', () => {
-      const result = assertion.exactLength('2', 2);
+      const result = base.exactLength('2', 2);
       expect(result).instanceOf(ContractError);
       expect(result.message).equal('expected to have length of 2: 2');
     });
 
     it('should report error for non-matching length - array', () => {
-      const result = assertion.exactLength([1, 2, 3], 5);
+      const result = base.exactLength([1, 2, 3], 5);
       expect(result).instanceOf(ContractError);
       expect(result.message).equal('expected to have length of 5: 1,2,3');
     });
@@ -152,24 +153,24 @@ describe('base', () => {
 
   describe('minLength', () => {
     it('should report true for matching length', () => {
-      expect(assertion.minLength('asdf',    4)).true;
-      expect(assertion.minLength('',        0)).true;
-      expect(assertion.minLength([1, 2, 3], 3)).true;
+      expect(base.minLength('asdf',    4)).true;
+      expect(base.minLength('',        0)).true;
+      expect(base.minLength([1, 2, 3], 3)).true;
     });
 
     it('should report true for bigger length', () => {
-      expect(assertion.minLength('asdf',    3)).true;
-      expect(assertion.minLength([1, 2, 3], 2)).true;
+      expect(base.minLength('asdf',    3)).true;
+      expect(base.minLength([1, 2, 3], 2)).true;
     });
 
     it('should report error for smaller length - string', () => {
-      const result = assertion.minLength('asdf', 5);
+      const result = base.minLength('asdf', 5);
       expect(result).instanceOf(ContractError);
       expect(result.message).equal('expected to have min length of 5: asdf');
     });
 
     it('should report error for smaller length - array', () => {
-      const result = assertion.minLength([1, 2, 3], 5);
+      const result = base.minLength([1, 2, 3], 5);
       expect(result).instanceOf(ContractError);
       expect(result.message).equal('expected to have min length of 5: 1,2,3');
     });
@@ -179,24 +180,24 @@ describe('base', () => {
 
   describe('maxLength', () => {
     it('should report true for matching length', () => {
-      expect(assertion.maxLength('asdf',    4)).true;
-      expect(assertion.maxLength('',        0)).true;
-      expect(assertion.maxLength([1, 2, 3], 3)).true;
+      expect(base.maxLength('asdf',    4)).true;
+      expect(base.maxLength('',        0)).true;
+      expect(base.maxLength([1, 2, 3], 3)).true;
     });
 
     it('should report true for smaller length', () => {
-      expect(assertion.maxLength('asdf',    5)).true;
-      expect(assertion.maxLength([1, 2, 3], 4)).true;
+      expect(base.maxLength('asdf',    5)).true;
+      expect(base.maxLength([1, 2, 3], 4)).true;
     });
 
     it('should report error for smaller length - string', () => {
-      const result = assertion.maxLength('asdf', 3);
+      const result = base.maxLength('asdf', 3);
       expect(result).instanceOf(ContractError);
       expect(result.message).equal('expected to have max length of 3: asdf');
     });
 
     it('should report error for smaller length - array', () => {
-      const result = assertion.maxLength([1, 2, 3], 2);
+      const result = base.maxLength([1, 2, 3], 2);
       expect(result).instanceOf(ContractError);
       expect(result.message).equal('expected to have max length of 2: 1,2,3');
     });
@@ -207,7 +208,7 @@ describe('base', () => {
   describe('length', () => {
     it('should call exactLength if passed a number', () => {
       const fakeAssertion = {
-        length:      assertion.length,
+        length:      base.length,
         exactLength: stub().returns('foo')
       };
 
@@ -220,7 +221,7 @@ describe('base', () => {
 
     it('should call minLength if passed an object with "min"', () => {
       const fakeAssertion = {
-        length:    assertion.length,
+        length:    base.length,
         minLength: stub().returns(true)
       };
 
@@ -233,7 +234,7 @@ describe('base', () => {
 
     it('should call maxLength if passed an object with "max"', () => {
       const fakeAssertion = {
-        length:    assertion.length,
+        length:    base.length,
         maxLength: stub().returns(true)
       };
 
@@ -246,7 +247,7 @@ describe('base', () => {
 
     it('should call minLength and maxLength if passed an object with "min" and "max" -- positive result', () => {
       const fakeAssertion = {
-        length:    assertion.length,
+        length:    base.length,
         minLength: stub().returns(true),
         maxLength: stub().returns(true)
       };
@@ -266,7 +267,7 @@ describe('base', () => {
 
     it('should call minLength and maxLength if passed an object with "min" and "max" -- negative result in min', () => {
       const fakeAssertion = {
-        length:    assertion.length,
+        length:    base.length,
         minLength: stub().returns('error'),
         maxLength: stub().returns(true)
       };
@@ -282,7 +283,7 @@ describe('base', () => {
 
     it('should call minLength and maxLength if passed an object with "min" and "max" -- negative result in max', () => {
       const fakeAssertion = {
-        length:    assertion.length,
+        length:    base.length,
         minLength: stub().returns(true),
         maxLength: stub().returns('error')
       };
@@ -298,7 +299,7 @@ describe('base', () => {
 
     it('should call minLength and maxLength if passed an object with "min" and "max" -- negative result in both', () => {
       const fakeAssertion = {
-        length:    assertion.length,
+        length:    base.length,
         minLength: stub().returns('minError'),
         maxLength: stub().returns('maxError')
       };
@@ -324,24 +325,161 @@ describe('base', () => {
 
   describe('value', () => {
     it('should report true for strict equality', () => {
-      expect(assertion.value('asdf',    'asdf')).true;
-      expect(assertion.value('',        '')).true;
-      expect(assertion.value(1,        1)).true;
+      expect(base.value('asdf',    'asdf')).true;
+      expect(base.value('',        '')).true;
+      expect(base.value(1,        1)).true;
 
       const foo = [];
-      expect(assertion.value(foo, foo)).true;
+      expect(base.value(foo, foo)).true;
     });
 
     it('should report error for strict inequality', () => {
-      const result = assertion.value('asdf', 3);
+      const result = base.value('asdf', 3);
       expect(result).instanceOf(ContractError);
       expect(result.message).equal('expected to be strictly equal to 3: asdf');
     });
 
     it('should report error for strict inequality', () => {
-      const result = assertion.value([], []);
+      const result = base.value([], []);
       expect(result).instanceOf(ContractError);
       expect(result.message).match(/expected to be strictly equal to/);
     });
   }); // value
+
+
+
+  describe('_validate', () => {
+
+    it('should call _validate on child assertions and self', () => {
+      const contract = {
+        foo: 'Foo',
+        bar: 'Bar',
+        baz: 'Baz'
+      };
+
+      const fooSpy  = stub().returns([]);
+      const barSpy  = stub().returns(true);
+      base.baz = stub().returns(true);
+
+      const assertions = {
+        foo: spy(class Foo { _validate (...args) { return fooSpy(...args); }}),
+        bar: spy(class Bar { _validate (...args) { return barSpy(...args); }})
+      };
+
+      const result = base._validate('victim', contract, assertions);
+
+      expect(result).deep.equal([]);
+
+      expect(fooSpy)
+        .calledOnce
+        .calledWithExactly('victim', 'Foo');
+
+      expect(barSpy)
+        .calledOnce
+        .calledWithExactly('victim', 'Bar');
+
+      expect(base.baz)
+        .calledOnce
+        .calledWithExactly('victim', 'Baz');
+
+      expect(assertions.foo)
+        .calledOnce
+        .calledWithExactly(assertions);
+
+      expect(assertions.bar)
+        .calledOnce
+        .calledWithExactly(assertions);
+    });
+
+
+
+    it('should return the failed assertion', () => {
+      const contract = {
+        foo: 'Foo',
+        bar: 'Bar',
+        baz: 'Baz'
+      };
+
+      const fooSpy  = stub().returns({message: 'Foo'});
+      const barSpy  = stub().returns(true);
+      base.baz = stub().returns({message: 'Bar'});
+
+      const assertions = {
+        foo: class Foo { _validate (...args) { return fooSpy(...args); }},
+        bar: class Bar { _validate (...args) { return barSpy(...args); }}
+      };
+
+      const result = base._validate('victim', contract, assertions);
+
+      expect(result.length).equal(2);
+      expect(result[0]).deep.equal({message: 'Foo'});
+      expect(result[1]).deep.equal({message: 'Bar'});
+    });
+
+
+
+    it('should throw on a missing assertion', () => {
+      const contract = {
+        foo: 'Foo'
+      };
+
+      expect( () => {
+        base._validate('victim', contract, {});
+      })
+        .throw(Error, /does not exist/);
+    });
+
+
+    describe('optional', () => {
+      it('should allow undefined', () => {
+        const result =
+          base._validate(undefined, {
+            optional: true,
+            string:   true
+          });
+
+        expect(result).instanceof(Array).length(0);
+      });
+
+
+
+      it(' should not block other checks', () => {
+        const result =
+          base._validate(5, {
+            optional: true,
+            string:   true
+          });
+
+        expect(result).instanceof(Array).length(1);
+        expect(result[0]).instanceof(ContractError);
+        expect(result[0].message).match(/string/)
+      });
+    }); // optional
+  }); // _validate
+
+
+
+  describe('or', () => {
+    it('should return [] if at least one of assertions is fine', () => {
+      const result = or('1', {number: true, string: true});
+      expect(result).deep.equal([]);
+    });
+
+    it('should combine base and child assertions', () => {
+      const result = or('1', {number: true, string: true, value: '1'});
+      expect(result).deep.equal([]);
+    });
+
+    it('should return [] if at all assertions are fine', () => {
+      const result = or('1', {number: {orString: true}, string: true});
+      expect(result).deep.equal([]);
+    });
+
+    it('should return errors if all assertions fail', () => {
+      const result = or(true, {number: true, string: true});
+      expect(result).length(2);
+      expect(result[0]).instanceof(ContractError);
+      expect(result[1]).instanceof(ContractError);
+    });
+  }); // or
 });

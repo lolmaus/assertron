@@ -55,8 +55,8 @@ function myFunc(foo, bar) {
     * [x] length / len
     * [x] minLength
     * [x] maxLength
-    * [ ] or
-    * [ ] optional
+    * [x] or
+    * [x] optional
     * [ ] instanceof
     * [ ] lt
     * [ ] lte

@@ -136,5 +136,24 @@ describe('V', () => {
     });
   }); // multiple assertions
 
+  describe('optional', () => {
+    it('should allow undefined', () => {
+      V(undefined, {
+        optional: true,
+        string:   true
+      });
+    });
+
+    it(' should not block other checks', () => {
+      expect(() => {
+        V(5, {
+          optional: true,
+          string:   true
+        });
+      })
+        .throws(ContractError, /string/);
+    });
+  }); // optional
+
 });
 

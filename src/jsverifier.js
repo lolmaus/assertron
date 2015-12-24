@@ -21,9 +21,8 @@ export class Assertron {
   }
 
   validate(victim, contract) {
-    const rootAss = new this.assertions.root({assertions: this.assertions});
-    const errors = rootAss._validate(victim, contract);
-    console.log('errors', errors)
+    const baseAss = new this.assertions.base({assertions: this.assertions});
+    const errors = baseAss._validate(victim, contract);
     this.toss(errors);
     return true;
   }
