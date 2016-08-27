@@ -14,8 +14,6 @@ export default class Assertion {
   }
 
   assert (subject, contract) {
-    console.debug(`Assertion ${this._name} _assert`, subject, contract)
-
     let result = this.test__main(subject, contract)
 
     if (result) return result
