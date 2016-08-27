@@ -1,0 +1,67 @@
+{
+  "name": "assertron",
+  "version": "0.0.1",
+  "description": "Run assertions against your objects. Define contracts with a handy DSL. Test your code inline.",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "gulp",
+    "lint": "gulp lint",
+    "test-browser": "gulp test-browser",
+    "watch": "gulp watch",
+    "build": "gulp build",
+    "coverage": "gulp coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lolmaus/assertron.git"
+  },
+  "keywords": [],
+  "author": "Andrey Mikhaylov (lolmaus) <lolmaus@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lolmaus/assertron/issues"
+  },
+  "homepage": "https://github.com/lolmaus/assertron",
+  "devDependencies": {
+    "babel-core": "^6.3.26",
+    "babel-eslint": "^6.1.2",
+    "babel-loader": "^6.2.0",
+    "babel-polyfill": "^6.3.14",
+    "babel-preset-es2015": "^6.3.13",
+    "babel-preset-stage-1": "^6.13.0",
+    "babel-register": "^6.3.13",
+    "chai": "^3.4.1",
+    "del": "^2.2.0",
+    "eslint-config-standard": "^6.0.0-beta.3",
+    "eslint-plugin-babel": "^3.3.0",
+    "eslint-plugin-promise": "^2.0.1",
+    "eslint-plugin-standard": "^2.0.0",
+    "glob": "^7.0.3",
+    "gulp": "^3.9.0",
+    "gulp-eslint": "^3.0.0",
+    "gulp-filter": "^4.0.0",
+    "gulp-istanbul": "^1.0.0",
+    "gulp-livereload": "^3.8.1",
+    "gulp-load-plugins": "^1.1.0",
+    "gulp-mocha": "^2.2.0",
+    "gulp-plumber": "^1.0.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-uglify": "^1.5.1",
+    "isparta": "^4.0.0",
+    "json-loader": "^0.5.3",
+    "mocha": "^2.3.4",
+    "sinon": "^1.17.2",
+    "sinon-chai": "^2.8.0",
+    "webpack": "^1.12.9",
+    "webpack-stream": "^3.1.0"
+  },
+  "babelBoilerplateOptions": {
+    "entryFileName": "index.js",
+    "mainVarName": "assert"
+  },
+  "dependencies": {
+    "assertion-error": "^1.0.2",
+    "lodash": "^4.15.0"
+  }
+}
