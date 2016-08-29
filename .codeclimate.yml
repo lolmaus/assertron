@@ -9,6 +9,7 @@ engines:
       - php
   eslint:
     enabled: true
+    channel: "eslint-2"
   fixme:
     enabled: true
 ratings:
