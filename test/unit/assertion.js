@@ -152,6 +152,23 @@ describe('Assertion class', () => {
 
 
 
+  describe("method: _iterateContract", () => {
+    it("should map subject using the callback, then filter out nully values", () => {
+      const assertion  = new BaseAssertion()
+      const contract   = {foo: 1, bar: 2, baz: 3, quux: 4}
+      const callback   = spy((name, value) => (value >= 3) ? name + value : null)
+      const result     = assertion._iterateContract(contract, callback)
+      expect(result).eql(['baz3', 'quux4'])
+      expect(callback).callCount(4)
+      expect(callback.withArgs('foo',  1)).calledOnce
+      expect(callback.withArgs('bar',  2)).calledOnce
+      expect(callback.withArgs('baz',  3)).calledOnce
+      expect(callback.withArgs('quux', 4)).calledOnce
+    })
+  })
+
+
+
   describe("test: main", () => {
     it("should be a noop", () => {
       const assertion = new BaseAssertion()
@@ -169,13 +186,44 @@ describe('Assertion class', () => {
       expect(result).undefined
     })
 
-    it("should return error text for failing test", () => {
+    it("should return error object for failing test", () => {
       const assertion = new BaseAssertion()
       const result    = assertion.test__is(1, 2)
       expect(result).eql({
         message:  "Expected 2, got 1",
         expected: 2,
         actual:   1
+      })
+    })
+  })
+
+
+
+  describe("test: or", () => {
+    it("should return nothing when both tests passed", () => {
+      const assertion = new BaseAssertion()
+      assertion.test__foo = () => {}
+      assertion.test__bar = () => {}
+      const result  = assertion.test__or(1, {foo: true, bar: true})
+      expect(result).undefined
+    })
+
+    it("should return nothing when one of tests passed", () => {
+      const assertion = new BaseAssertion()
+      assertion.test__foo = () => {}
+      assertion.test__bar = () => ({message: "lol"})
+      const result        = assertion.test__or(1, {foo: true, bar: true})
+      expect(result).undefined
+    })
+
+    it("should return error object when none of tests passed", () => {
+      const assertion = new BaseAssertion()
+      assertion.test__foo = () => ({message: "lolfoo"})
+      assertion.test__bar = () => ({message: "lolbar"})
+      const result        = assertion.test__or(1, {foo: true, bar: true})
+      expect(result).eql({
+        message: "Expected at least one of given assertions to pass",
+        errors:  [{message: "lolfoo"}, {message: "lolbar"}]
       })
     })
   })
