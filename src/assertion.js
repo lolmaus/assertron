@@ -1,8 +1,5 @@
-import pipe from './utils/pipe'
-
 import isObject from 'lodash/isObject'
-import map      from 'lodash/map'
-import compact  from 'lodash/compact'
+import flatten  from 'lodash/flatten'
 
 export default class Assertion {
 
@@ -33,26 +30,33 @@ export default class Assertion {
     return this[methodName]
   }
 
+  _iterateContract (contract, callback) {
+    return Object
+      .keys(contract)
+      .map(assertionName => {
+        const subContract = contract[assertionName]
+        return callback(assertionName, subContract)
+      })
+      .filter(o => o)
+  }
+
   _processContract (subject, contract) {
     if (!isObject(contract)) throw new Error("Assertron: assertion should be an object")
 
     const result =
-      pipe()(
-        () => map(contract, (subContract, assertionName) => {
-          const assertion = this._getAssertion(assertionName)
+      this._iterateContract(contract, (assertionName, subContract) => {
+        const assertion   = this._getAssertion(assertionName)
 
-          if (assertion) {
-            return assertion.assert(subject, subContract)
-          }
+        if (assertion) {
+          return assertion.assert(subject, subContract)
+        }
 
-          const test = this._getTest(assertionName)
+        const test = this._getTest(assertionName)
 
-          if (!test) throw new Error(`Assertron: unknown assertion: ${assertionName}`)
+        if (!test) throw new Error(`Assertron: unknown assertion: ${assertionName}`)
 
-          return test.call(this, subject, subContract)
-        }),
-        compact
-      )
+        return test.call(this, subject, subContract)
+      })
 
     if (result.length) return result
   }
@@ -66,6 +70,20 @@ export default class Assertion {
       message:  `Expected ${expected}, got ${actual}`,
       expected,
       actual
+    }
+  }
+
+  test__or (subject, contract) {
+    const result =
+      this._iterateContract(contract, (assertionName, subContract) => {
+        return this.assert(subject, {[assertionName]: subContract})
+      })
+
+    if (result.length !== Object.keys(contract).length) return
+
+    return {
+      message: "Expected at least one of given assertions to pass",
+      errors:  flatten(result)
     }
   }
 }

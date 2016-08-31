@@ -24,5 +24,39 @@ describe('assertron', () => {
       }).throw(AssertionError, /Expected to be a number, got 1/)
     })
 
+    it('or pass', () => {
+      assert(1, {
+        or: {
+          number: true,
+          string: true
+        }
+      })
+    })
+
+    it('or fail', () => {
+      expect(() => assert(new Date(), {
+        or: {
+          number: true,
+          string: true
+        }
+      })).throw(/Expected at least one of given assertions to pass/)
+    })
+
+    // it("optional pass", () => {
+    //   assert(null, {
+    //     number:   true,
+    //     optional: true
+    //   })
+    // })
+    //
+    // it('optional fail', () => {
+    //   expect(() => assert("1", {
+    //     or: {
+    //       number:   true,
+    //       optional: true
+    //     }
+    //   })).throw(/Expected to be a number, got 1/)
+    // })
+
   })
 })
